@@ -40,14 +40,23 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody SignUpForm signUpRequest) {
-        User user = new User();
-        user.setUsername(signUpRequest.getUsername());
-        user.setPassword(signUpRequest.getPassword());
-        userService.signUp(user);
 
         Response<String> response = new Response();
-        response.setResponseCode(HttpStatus.CREATED);
-        response.setData("User has been succesfully created");
+
+        if(userService
+                .isUsernameAvailable(signUpRequest.getUsername())) {
+            response.setErrorMessage("User Name already taken");
+            response.setResponseCode(HttpStatus.CONFLICT);
+
+        } else {
+
+            User user = new User();
+            user.setUsername(signUpRequest.getUsername());
+            user.setPassword(signUpRequest.getPassword());
+            userService.signUp(user);
+            response.setResponseCode(HttpStatus.CREATED);
+            response.setData("User has been succesfully created");
+        }
         return new ResponseEntity<>(response, HttpStatus.resolve(response.getResponseCode()));
     }
 
@@ -67,4 +76,23 @@ public class UserController {
 
         return new ResponseEntity<>(response, HttpStatus.resolve(response.getResponseCode()));
     }
+
+    @PutMapping("/updateUser")
+    public ResponseEntity<?> updateUser(@RequestBody User user) {
+        Response<String> response = new Response<>();
+        String message;
+
+        if(userService.updateUser(user)) {
+            message = "user details updated successfully";
+            response.setData(message);
+            response.setResponseCode(HttpStatus.OK);
+        } else {
+            response.setData("user details updation failed");
+            response.setResponseCode(HttpStatus.CONFLICT);
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.resolve(response.getResponseCode()));
+    }
+
+
 }

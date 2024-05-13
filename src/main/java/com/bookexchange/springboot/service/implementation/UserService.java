@@ -5,7 +5,6 @@ import com.bookexchange.springboot.dto.LoginResponse;
 import com.bookexchange.springboot.entity.User;
 import com.bookexchange.springboot.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -58,4 +57,18 @@ public class UserService {
             return false;
         }
     }
+
+
+    public boolean updateUser(User user) {
+        Optional<User> usera = userRepository.findByUsername(user.getUsername());
+
+        if(usera.isPresent()) {
+            usera.get().setPassword(user.getPassword());
+            userRepository.saveAndFlush(usera.get());
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }

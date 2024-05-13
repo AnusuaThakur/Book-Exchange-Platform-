@@ -53,7 +53,6 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
-    //eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnc2FzdHJ5MiIsImlhdCI6MTcxNTU5NTQ0MywiZXhwIjoxNzE1NTk2NDQzfQ.ru48JbmD47kO0Ij_qHknPTwRZGnKVCXm_Umj5wwyLgtGgxhfFKSxolU6MfMdsgsZxfCwIxLI0tsfePHtDHpvSg
     @Bean
     public static PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

@@ -2,7 +2,6 @@ package com.bookexchange.springboot.configuration;
 
 import com.bookexchange.springboot.dto.Response;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
