@@ -1,9 +1,6 @@
 package com.bookexchange.springboot.entity;
 
-import jakarta.persistence.*;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
