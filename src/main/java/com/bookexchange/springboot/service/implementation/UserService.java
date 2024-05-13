@@ -1,15 +1,19 @@
 package com.bookexchange.springboot.service.implementation;
 
 import com.bookexchange.springboot.configuration.JwtTokenProvider;
+import com.bookexchange.springboot.dto.LoginResponse;
 import com.bookexchange.springboot.entity.User;
 import com.bookexchange.springboot.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -35,13 +39,23 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public String login(User user) {
+    public LoginResponse login(User user) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String token = jwtTokenProvider.generateToken(authentication);
 
-        return "User logged in " + token;
+        return new LoginResponse(token);
+    }
+
+    public boolean isUsernameAvailable(String userName) {
+        Optional<User> user = userRepository.findByUsername(userName);
+
+        if(user.isPresent()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

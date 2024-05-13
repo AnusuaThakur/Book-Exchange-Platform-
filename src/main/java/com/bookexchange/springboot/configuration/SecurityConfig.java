@@ -38,7 +38,9 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize ->
-                        authorize.antMatchers(HttpMethod.POST, "/api/**").permitAll()
+                        authorize.antMatchers(HttpMethod.POST, "/api/user/login").permitAll()
+                                .antMatchers(HttpMethod.POST, "/api/user/signup").permitAll()
+                                .antMatchers(HttpMethod.GET, "/api/user/checkUsernameAvailablility").permitAll()
                                 .antMatchers("/h2-console/**").permitAll()
                                 .antMatchers("/h2-console/**/**").permitAll()
                                 .anyRequest().authenticated()
@@ -51,6 +53,7 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
+    //eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnc2FzdHJ5MiIsImlhdCI6MTcxNTU5NTQ0MywiZXhwIjoxNzE1NTk2NDQzfQ.ru48JbmD47kO0Ij_qHknPTwRZGnKVCXm_Umj5wwyLgtGgxhfFKSxolU6MfMdsgsZxfCwIxLI0tsfePHtDHpvSg
     @Bean
     public static PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

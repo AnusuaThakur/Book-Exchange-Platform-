@@ -1,18 +1,21 @@
 package com.bookexchange.springboot.controller;
 
 import com.bookexchange.springboot.dto.LoginRequest;
+import com.bookexchange.springboot.dto.LoginResponse;
+import com.bookexchange.springboot.dto.Response;
 import com.bookexchange.springboot.dto.SignUpForm;
 import com.bookexchange.springboot.entity.User;
 import com.bookexchange.springboot.repository.UserRepository;
 import com.bookexchange.springboot.service.implementation.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/user")
 public class UserController {
 
     @Autowired
@@ -22,14 +25,17 @@ public class UserController {
     UserRepository userRepository;
 
 
-
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
         User user = new User();
         user.setUsername(loginRequest.getUsername());
         user.setPassword(loginRequest.getPassword());
-        String response = userService.login(user);
-        return ResponseEntity.ok(response);
+        LoginResponse loginResponse = userService.login(user);
+
+        Response<LoginResponse> response = new Response<>();
+        response.setResponseCode(HttpStatus.OK);
+        response.setData(loginResponse);
+        return new ResponseEntity<>(response, HttpStatus.resolve(response.getResponseCode()));
     }
 
     @PostMapping("/signup")
@@ -38,17 +44,27 @@ public class UserController {
         user.setUsername(signUpRequest.getUsername());
         user.setPassword(signUpRequest.getPassword());
         userService.signUp(user);
-        return ResponseEntity.ok("User registered successfully!");
+
+        Response<String> response = new Response();
+        response.setResponseCode(HttpStatus.CREATED);
+        response.setData("User has been succesfully created");
+        return new ResponseEntity<>(response, HttpStatus.resolve(response.getResponseCode()));
     }
 
-    @GetMapping("/users")
+    @GetMapping("/checkUsernameAvailablility")
     public ResponseEntity<?> getUsers(@RequestParam String userName) {
-        Optional<User> user = userRepository.findByUsername(userName);
-
-        if(user.isPresent()) {
-            return ResponseEntity.ok("User found " + user.get());
+        Response<String> response = new Response<>();
+        String message;
+        if(userService.isUsernameAvailable(userName)) {
+            message = "User Name already taken";
+            response.setResponseCode(HttpStatus.CONFLICT);
+            response.setData(message);
         } else {
-            return ResponseEntity.ok("user not found");
+            message = "User name is available";
+            response.setData(message);
+            response.setResponseCode(HttpStatus.OK);
         }
+
+        return new ResponseEntity<>(response, HttpStatus.resolve(response.getResponseCode()));
     }
 }

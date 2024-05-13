@@ -1,5 +1,9 @@
 package com.bookexchange.springboot.configuration;
 
+import com.bookexchange.springboot.dto.Response;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.ExpiredJwtException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,7 +44,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // Skip authentication for certain endpoints
-        if (requestURI.equals("/api/signup") || requestURI.equals("/api/login")) {
+        if (requestURI.equals("/api/user/signup") || requestURI.equals("/api/user/login") || requestURI.equals("/api/user/checkUsernameAvailablility")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -62,7 +66,12 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            Response<String> errorResponse = new Response<>();
+            errorResponse.setErrorMessage("Unauthorized user");
+            errorResponse.setResponseCode(HttpStatus.UNAUTHORIZED);
+            ObjectMapper mapper = new ObjectMapper();
+            response.getWriter().write(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(errorResponse));
         }
     }
 
